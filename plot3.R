@@ -1,0 +1,22 @@
+#ask the user xpedient to select the file 'household_power_consumption.txt'
+message("please, provide input file 'household_power_consumption.txt'")
+inputfile<-file.choose()
+
+#read a subsetting of the dataset
+message("Reading data...")
+suppressWarnings(hpc<-read.table(file = inputfile, header = F, sep = ";", na.strings = "?", skip=grep("\\b1/2/2007\\b", readLines("household_power_consumption.txt")), nrows = 48*60))
+colnames(hpc)<-c("Date", "Time","Global_active_power", "Global_reactive_power", "Voltage", "Global_intensity","Sub_metering_1", "Sub_metering_2", "Sub_metering_3")
+
+#formatting Data and Time variables properly
+hpc$Date<-as.Date(hpc$Date, "%d/%m/%Y")
+hpc$Time<-as.POSIXct(paste(hpc$Date, hpc$Time), format="%Y-%m-%d %H:%M:%S")
+
+#print a scatterplot as required
+par(bg="transparent")
+png(filename= "plot3.png", bg="transparent")
+plot(hpc$Time, hpc$Sub_metering_1, type ="l", ylab = "Energy sub metering", xlab = NA)
+points(x=hpc$Time, y=hpc$Sub_metering_2, col= "red", type="l")
+points(x= hpc$Time, y=hpc$Sub_metering_3, col="blue", type="l")
+legend("topright", lty = c(1,1,1), col=c("black", "red","blue"), legend = c("Sub_metering_1", "Sub_metering_2", "Sub_metering_3"),cex=1, y.intersp=1 )
+dev.off()
+message("'plot3.png' has been generated")
